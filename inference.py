@@ -51,7 +51,7 @@ def draw_detections(image, boxes, scores, class_ids, mask_alpha=0.4):
 class YOLOv10:
     def __init__(self, path):
         self.session, self.input_name, self.output_name, self.input_width, self.input_height, self.input_shape = self.initialize_model(path)
-        self.draw_detections_helper = draw_detections # Assign helper function
+        # self.draw_detections_helper assignment removed
 
     def initialize_model(self, path):
         session = onnxruntime.InferenceSession(path, providers=onnxruntime.get_available_providers())
@@ -68,9 +68,9 @@ class YOLOv10:
 
     def detect_objects(self, image, conf_threshold=0.3):
         input_tensor = self.prepare_input(image)
-        # The inference method now returns the image with detections drawn on it.
-        output_image_with_detections = self.inference(image, input_tensor, conf_threshold)
-        return output_image_with_detections
+        # Now returns raw detections: boxes, scores, class_ids
+        boxes, scores, class_ids = self.inference(image, input_tensor, conf_threshold)
+        return boxes, scores, class_ids
 
     def prepare_input(self, image):
         self.img_height, self.img_width = image.shape[:2]
@@ -87,11 +87,12 @@ class YOLOv10:
 
         boxes, scores, class_ids = self.process_output(outputs[0], conf_threshold)
 
-        # Call the internal drawing method that uses the helper
-        output_image = self.draw_detections_internal(image.copy(), boxes, scores, class_ids) # Pass a copy of the image
+        # No longer draw detections here, return raw data
+        # output_image = self.draw_detections_internal(image.copy(), boxes, scores, class_ids) # Pass a copy of the image
 
         print(f"Inference time: {(time.perf_counter() - start)*1000:.2f} ms")
-        return output_image
+        # Return raw detections
+        return boxes, scores, class_ids
 
 
     def process_output(self, output, conf_threshold=0.3):
@@ -148,6 +149,4 @@ class YOLOv10:
         output_details = [{'name': output.name, 'shape': output.shape, 'type': output.type} for output in model_outputs]
         return output_details
 
-    def draw_detections_internal(self, image, boxes, scores, class_ids, mask_alpha=0.4):
-        """ Internal method to call the global draw_detections helper. """
-        return self.draw_detections_helper(image, boxes, scores, class_ids, mask_alpha)
+    # draw_detections_internal method removed
