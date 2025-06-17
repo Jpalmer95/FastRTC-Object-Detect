@@ -1,0 +1,36 @@
+{
+  "functions": [
+    {
+      "source": "firebase_functions",
+      "codebase": "default",
+      "ignore": [
+        "venv",
+        ".git",
+        "*.pyc",
+        "__pycache__/"
+      ],
+      "runtime": "python310"
+    }
+  ],
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/app/**",
+        "run": {
+          "serviceId": "YOUR_GRADIO_CLOUD_RUN_SERVICE_ID",
+          "region": "YOUR_CLOUD_RUN_REGION"
+        }
+      },
+      {
+        "source": "/",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
